@@ -45,13 +45,13 @@ def queryDataSet(username, password, AppKey):
         "UserName" : data["UserName"]
     }
 
-    marketSearchUrl = f'{baseUrl}/market/search?SearchByMarketName=TRUE&Query=EUR%2FUSD&MaxResults=10'
+    marketSearchUrl = f'{baseUrl}/market/search?SearchByMarketName=TRUE&Query=AUD%2FUSD&MaxResults=10'
     marketsResult = requests.get(marketSearchUrl, headers=authHeaders)
 
     #   print(marketsResult.json())
     marketId = marketsResult.json()["Markets"][0]["MarketId"]
 
-    priceHistoryUrl = f'{baseUrl}/market/{marketId}/barhistory?interval=HOUR&span=4&PriceBars=250'
+    priceHistoryUrl = f'{baseUrl}/market/{marketId}/barhistory?interval=HOUR&span=1&PriceBars=600'
     priceHistory = requests.get(priceHistoryUrl, headers=authHeaders)
 
     priceHistoryDict = priceHistory.json()["PriceBars"]
@@ -75,12 +75,6 @@ closeAndTimeDataSet = closeAndTimeDataSet.drop('BarDate', axis=1)
 
 # closeAndTimeDataSet.plot()
 # pyplot.show()
-
-# # box and whisker plots
-# # pricingDataset.plot(kind='box', subplots=True, layout=(2,2), sharex=False, sharey=False)
-# # pricingDataset.hist()
-# # pandas.plotting.scatter_matrix(pricingDataset)
-# # pyplot.show()
 
 print(closeAndTimeDataSet.describe())
 array = closeAndTimeDataSet.values
@@ -172,111 +166,3 @@ pred_price = model.predict(X_test)
 pred_price = scaler.inverse_transform(pred_price)
 
 print(pred_price)
-
-# X = array[:,1:5]
-# y = array[:,5]
-# train = array[0:100,:]
-# valid = array[100:,:]
-# scaler = MinMaxScaler(feature_range=(0, 1))
-# scaled_data = scaler.fit_transform(closeAndTimeDataSet)
-
-# x_train, y_train = [], []
-# for i in range(60,len(train)):
-#     # print(scaled_data[i-1:i,0])
-#     x_train.append(scaled_data[i-60:i,0])
-#     y_train.append(scaled_data[i,0])
-# x_train, y_train = numpy.array(x_train), numpy.array(y_train)
-
-# x_train = numpy.reshape(x_train, (x_train.shape[0],x_train.shape[1],1))
-# # print(x_train)
-# # print(y_train)
-
-# model = Sequential()
-# model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1],1)))
-# model.add(LSTM(units=50))
-# model.add(Dense(1))
-
-# model.compile(loss='mean_squared_error', optimizer='adam')
-# model.fit(x_train, y_train, epochs=1, batch_size=1, verbose=2)
-
-# #predicting 246 values, using past 60 from the train data
-# inputs = closeAndTimeDataSet[len(closeAndTimeDataSet) - len(valid) - 60:].values
-# inputs = inputs.reshape(-1,1)
-# inputs  = scaler.transform(inputs)
-
-# X_test = []
-# for i in range(60,inputs.shape[0]):
-#     X_test.append(inputs[i-60:i,0])
-# X_test = numpy.array(X_test)
-
-
-# X_test = numpy.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
-# closing_price = model.predict(X_test)
-# closing_price = scaler.inverse_transform(closing_price)
-# print(len(closing_price))
-# # print(valid)
-
-# # rms=numpy.sqrt(numpy.mean(numpy.power((valid-closing_price),2)))
-# # print(rms)
-# # 11.772259608962642
-# #for plotting
-# train = closeAndTimeDataSet[:100]
-# valid = closeAndTimeDataSet[100:]
-# valid['Predictions'] = closing_price
-# pyplot.plot(train['Close'])
-# pyplot.plot(valid[['Close','Predictions']])
-# pyplot.show()
-
-# # y = pricingDataset.loc[:,["positive_direction"]].values
-# X_train, X_validation, Y_train, Y_validation = train_test_split(X, y, test_size=0.20, random_state=1)
-
-# # print(X)
-# # K fold test is missing something to put values in buckets
-# # Spot Check Algorithms
-# models = []
-# models.append(('LR', LogisticRegression(solver='liblinear', multi_class='ovr')))
-# models.append(('LDA', LinearDiscriminantAnalysis()))
-# models.append(('KNN', KNeighborsClassifier()))
-# models.append(('CART', DecisionTreeClassifier()))
-# models.append(('NB', GaussianNB()))
-# models.append(('SVM', SVC(gamma='auto')))
-# models.append(('RFR', RandomForestRegressor(n_estimators = 1000, random_state = 1)))
-
-# # evaluate each model in turn
-# # results = []
-# # names = []
-# # for name, model in models:
-# # 	kfold = StratifiedKFold(n_splits=10, random_state=1, shuffle=True)
-# # 	cv_results = cross_val_score(model, X_train, Y_train, cv=kfold, scoring='accuracy')
-# # 	results.append(cv_results)
-# # 	names.append(name)
-# # 	print('%s: %f (%f)' % (name, cv_results.mean(), cv_results.std()))
-
-# # pyplot.boxplot(results, labels=names)
-# # pyplot.title('Algorithm Comparison')
-# # pyplot.show()
-
-# # model = LinearDiscriminantAnalysis()
-# # model.fit(X_train, Y_train)
-# # predictions = model.predict(X_validation)
-
-# # 
-# model = RandomForestRegressor(n_estimators = 1000, random_state = 1)
-# model.fit(X_train, Y_train)
-# predictions = model.predict(X_validation)
-
-# # print(X_validation)
-# # print(predictions)
-
-# preds = numpy.asarray([1 if val > 0.5 else 0 for val in predictions])
-
-# print(preds)
-# print(Y_validation)
-# print(accuracy_score(Y_validation, preds))
-# # print(confusion_matrix(Y_validation, preds))
-# # print(classification_report(Y_validation, preds))
-
-# # # Evaluate predictions
-# # print(accuracy_score(Y_validation, predictions))
-# # print(confusion_matrix(Y_validation, predictions))
-# # print(classification_report(Y_validation, predictions))
